@@ -27,6 +27,7 @@ struct pool
 };
 struct pool outstandingPool;
 struct pool duplicateFilter;
+struct pool quB;
 
 void initializePool( struct pool *pool, long long siz )
 {
@@ -66,9 +67,22 @@ void pushInPool(struct pool *myPool, long long stdId)
     sem_post( &(myPool->howMuchFull) );
 }
 
+long long popFromPool(struct pool *myPool)
+{
+    long long a, b, c, d, e, f, ret;
+    sem_wait( &(myPool->howMuchFull) );
+    pthread_mutex_lock( &(myPool->myMutex) );
+
+    //(myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
+    ret = (myPool->stdIdAr)[ (myPool->endIdx)++ ];
+
+
+    pthread_mutex_unlock( &(myPool->myMutex) );
+    sem_post( &(myPool->howMuchEmpty) );
+}
 
 void *studentThreadFunction(void *arg); // stdId will be passed
-void *teacherThreadFunction(void *arg); // Teacher name (A, C, E) will be passed
+void *teacherThreadFunction(void *arg); // Teacher name ('A', 'C', 'E') will be passed
 
 
 int main()
@@ -77,6 +91,8 @@ int main()
     printf("Safely initialized outstandingPool\n");
     initializePool( &duplicateFilter, INT_MAX );
     printf("Safely initialized duplicate pool \n");
+    initializePool(&quB, 1);
+    printf("Safely initialized queue for B \n");
     return 0;
 }
 
