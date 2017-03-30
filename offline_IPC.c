@@ -20,7 +20,7 @@ struct pool
 {
     pthread_mutex_t myMutex;
     long long startIdx, endIdx;
-    long long stdId[SIZE], password[SIZE];
+    long long stdIdAr[SIZE], passwordAr[SIZE];
     sem_t howMuchEmpty;
     sem_t howMuchFull;
 
@@ -51,6 +51,19 @@ void initializePool( struct pool *pool, long long siz )
         printf("Failed to initialize semaphore");
         exit(0);
     }
+}
+
+void pushInPool(struct pool *myPool, long long stdId)
+{
+    long long a, b, c, d, e, f;
+    sem_wait( &(myPool->howMuchEmpty) );
+    pthread_mutex_lock( &(myPool->myMutex) );
+
+    (myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
+
+
+    pthread_mutex_unlock( &(myPool->myMutex) );
+    sem_post( &(myPool->howMuchFull) );
 }
 
 
