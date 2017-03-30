@@ -4,6 +4,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <semaphore.h>
+#include <limits.h>
 //#include <mutex.h>
 
 
@@ -25,8 +26,9 @@ struct pool
 
 };
 struct pool outstandingPool;
+struct pool duplicateFilter;
 
-void initializePool( struct pool *pool )
+void initializePool( struct pool *pool, long long siz )
 {
     int res;
     res = pthread_mutex_init( &(pool->myMutex), NULL );
@@ -37,7 +39,7 @@ void initializePool( struct pool *pool )
     }
     pool->startIdx = 1;
     pool->endIdx = 0;
-    res = sem_init( &(pool->howMuchEmpty), 0, 10  );
+    res = sem_init( &(pool->howMuchEmpty), 0, siz  );
     if (res != 0)
     {
         printf("Failed to initialize semaphore");
@@ -53,12 +55,15 @@ void initializePool( struct pool *pool )
 
 
 void *studentThreadFunction(void *arg); // stdId will be passed
+void *teacherThreadFunction(void *arg); // Teacher name (A, C, E) will be passed
 
 
 int main()
 {
-    initializePool( &outstandingPool );
+    initializePool( &outstandingPool, 10 );
     printf("Safely initialized outstandingPool\n");
+    initializePool( &duplicateFilter, INT_MAX );
+    printf("Safely initialized duplicate pool \n");
     return 0;
 }
 
