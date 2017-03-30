@@ -15,7 +15,7 @@
 
 pthread_t stdThreadAr[SIZE];
 
-struct myPool
+struct pool
 {
     pthread_mutex_t myMutex;
     long long startIdx, endIdx;
@@ -24,9 +24,9 @@ struct myPool
     sem_t howMuchFull;
 
 };
-struct myPool outstandingPool;
+struct pool outstandingPool;
 
-void initializePool( struct myPool *pool )
+void initializePool( struct pool *pool )
 {
     int res;
     res = pthread_mutex_init( &(pool->myMutex), NULL );
