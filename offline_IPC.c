@@ -14,7 +14,17 @@
 
 #define SIZE 9999
 
-pthread_t stdThreadAr[SIZE];
+//pthread_t stdThreadAr[SIZE];
+//pthread_t teacherThreadAr[SIZE];
+void *threadResult;
+pthread_t threadAr[SIZE];
+long long globalAr[SIZE];
+
+
+void *studentThreadFunction(void *arg); // stdId will be passed
+void *aceThreadFunction(void *arg); // Teacher name ('A', 'C', 'E') will be passed
+void *bThreadFunction(void *arg);
+void *dThreadFunction(void *arg);
 
 struct pool
 {
@@ -81,11 +91,10 @@ long long popFromPool(struct pool *myPool)
     sem_post( &(myPool->howMuchEmpty) );
 }
 
-void *studentThreadFunction(void *arg); // stdId will be passed
-void *teacherThreadFunction(void *arg); // Teacher name ('A', 'C', 'E') will be passed
 
 
-int main()
+
+void initDS()
 {
     initializePool( &outstandingPool, 10 );
     printf("Safely initialized outstandingPool\n");
@@ -93,6 +102,55 @@ int main()
     printf("Safely initialized duplicate pool \n");
     initializePool(&quB, 1);
     printf("Safely initialized queue for B \n");
+}
+
+void createThreads()
+{
+    long long a, b, c, d, e, f, idx;
+    for ( a = 1; a <= TOTAL_APPLICATION; a++)
+    {
+        pthread_create( threadAr+a, NULL, studentThreadFunction, (void*)(globalAr+ (1+a%TOTAL_STUDENT) ) );
+    }
+    idx = TOTAL_APPLICATION + 1;
+
+    // creating ACE
+    pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'A') );
+    pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'C') );
+    pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'E') );
+
+    //creating B
+    pthread_create( threadAr+(idx++), NULL, bThreadFunction, (void*)(globalAr+'B') );
+
+    //creting D
+    pthread_create( threadAr+(idx++), NULL, dThreadFunction, (void*)(globalAr+'D') );
+}
+
+void joinThreads()
+{
+    long long a, b, c, d, e, f;
+    for ( a = 1; a <= TOTAL_APPLICATION+5; a++)
+    {
+        pthread_join( threadAr[a], &threadResult );
+    }
+}
+
+void init()
+{
+    long long a, b, c, d, e, f;
+    for ( a = 0; a < SIZE; a++)
+    {
+        globalAr[a] = a;
+    }
+    createThreads();
+    joinThreads();
+}
+
+
+
+
+int main()
+{
+
     return 0;
 }
 
@@ -100,6 +158,21 @@ void *studentThreadFunction(void *arg)
 {
     long long a, b, c, d, e, f;
     long long stdId = *( (int*) arg );
+}
+
+void *aceThreadFunction(void *arg)
+{
+
+}
+
+void *bThreadFunction(void *arg)
+{
+
+}
+
+void *dThreadFunction(void *arg)
+{
+
 }
 
 
