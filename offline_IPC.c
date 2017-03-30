@@ -22,8 +22,16 @@ struct myPool
     sem_t howMuchFull;
 };
 
+void *studentThreadFunction(void *arg); // stdId will be passed
+
 
 int main()
 {
     return 0;
+}
+
+void *studentThreadFunction(void *arg)
+{
+    long long a, b, c, d, e, f;
+    long long stdId = *( (int*) arg );
 }
