@@ -13,6 +13,8 @@
 
 #define SIZE 9999
 
+pthread_t stdThreadAr[SIZE];
+
 struct myPool
 {
     pthread_mutex_t myMutex;
@@ -56,7 +58,7 @@ void *studentThreadFunction(void *arg); // stdId will be passed
 int main()
 {
     initializeOustandingPool();
-
+    printf("Safely initialized outstandingPool\n");
     return 0;
 }
 
