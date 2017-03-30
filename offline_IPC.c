@@ -9,8 +9,8 @@
 
 
 #define NONE -1
-#define TOTAL_STUDENT 30
-#define TOTAL_APPLICATION 40
+#define TOTAL_STUDENT 1
+#define TOTAL_APPLICATION 2
 
 #define SIZE 9999
 
@@ -85,11 +85,13 @@ long long popFromPool(struct pool *myPool)
     pthread_mutex_lock( &(myPool->myMutex) );
 
     //(myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
-    ret = (myPool->stdIdAr)[ (myPool->endIdx)++ ];
+    ret = (myPool->stdIdAr)[ (myPool->startIdx)++ ];
 
 
     pthread_mutex_unlock( &(myPool->myMutex) );
     sem_post( &(myPool->howMuchEmpty) );
+
+    return ret;
 }
 
 
@@ -112,11 +114,14 @@ void createThreads()
     long long a, b, c, d, e, f, idx;
     for ( a = 1; a <= TOTAL_APPLICATION; a++)
     {
+        sleep(5);
         pthread_create( threadAr+a, NULL, studentThreadFunction, (void*)(globalAr+ (1+a%TOTAL_STUDENT) ) );
+        sleep(5);
     }
     idx = TOTAL_APPLICATION + 1;
 
     // creating ACE
+
     pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'A') );
     pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'C') );
     pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'E') );
@@ -161,12 +166,29 @@ int main()
 void *studentThreadFunction(void *arg)
 {
     long long a, b, c, d, e, f;
-    long long stdId = *( (int*) arg );
+    long long stdId = *( (long long*) arg );
+    sleep(5);
+    printf("%lld trying to put application in outstanding pool\n\n", stdId);
+    pushInPool( &outstandingPool, stdId );
+    printf("%lld successfully submitted application in outstanding pool\n\n", stdId);
+    sleep(5);
 }
 
 void *aceThreadFunction(void *arg)
 {
-
+    long long a, b, c, d, e, f, poppedStd;
+    char teacherName = *( (long long*) arg ) ;
+    sleep(5);
+    printf(" Teacher %c  started working \n\n", teacherName);
+    sleep(5);
+    while(1)
+    {
+        printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
+        sleep(5);
+        poppedStd = popFromPool( &outstandingPool );
+        printf("Teacher %c has popped std %lld from outstanding pool\n\n", teacherName, poppedStd);
+        sleep(5);
+    }
 }
 
 void *bThreadFunction(void *arg)
