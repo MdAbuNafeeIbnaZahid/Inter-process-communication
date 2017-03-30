@@ -38,6 +38,7 @@ struct pool
 struct pool outstandingPool;
 struct pool duplicateFilter;
 struct pool quB;
+struct pool quD;
 
 void initializePool( struct pool *pool, long long siz )
 {
@@ -102,6 +103,8 @@ void initDS()
     printf("Safely initialized duplicate pool \n");
     initializePool(&quB, 1);
     printf("Safely initialized queue for B \n");
+    initializePool(&quD, INT_MAX);
+    printf("Safely initialized queue for D \n");
 }
 
 void createThreads()
@@ -141,6 +144,7 @@ void init()
     {
         globalAr[a] = a;
     }
+    initDS();
     createThreads();
     joinThreads();
 }
@@ -150,7 +154,7 @@ void init()
 
 int main()
 {
-
+    init();
     return 0;
 }
 
