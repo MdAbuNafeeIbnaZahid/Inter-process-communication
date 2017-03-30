@@ -26,6 +26,51 @@ struct myPool
 };
 struct myPool outstandingPool;
 
+void initializePool( struct myPool *pool )
+{
+    int res;
+    res = pthread_mutex_init( &(pool->myMutex), NULL );
+    if (res != 0)
+    {
+        printf("Failed to initialize mutex");
+        exit(0);
+    }
+    pool->startIdx = 1;
+    pool->endIdx = 0;
+    res = sem_init( &(pool->howMuchEmpty), 0, 10  );
+    if (res != 0)
+    {
+        printf("Failed to initialize semaphore");
+        exit(0);
+    }
+    res = sem_init( &(pool->howMuchFull), 0, 0  );
+    if (res != 0)
+    {
+        printf("Failed to initialize semaphore");
+        exit(0);
+    }
+}
+
+
+void *studentThreadFunction(void *arg); // stdId will be passed
+
+
+int main()
+{
+    initializePool( &outstandingPool );
+    printf("Safely initialized outstandingPool\n");
+    return 0;
+}
+
+void *studentThreadFunction(void *arg)
+{
+    long long a, b, c, d, e, f;
+    long long stdId = *( (int*) arg );
+}
+
+
+// Target is not to use
+// It is obsolete
 void initializeOustandingPool()
 {
     int res;
@@ -50,20 +95,4 @@ void initializeOustandingPool()
         exit(0);
     }
 
-}
-
-void *studentThreadFunction(void *arg); // stdId will be passed
-
-
-int main()
-{
-    initializeOustandingPool();
-    printf("Safely initialized outstandingPool\n");
-    return 0;
-}
-
-void *studentThreadFunction(void *arg)
-{
-    long long a, b, c, d, e, f;
-    long long stdId = *( (int*) arg );
 }
