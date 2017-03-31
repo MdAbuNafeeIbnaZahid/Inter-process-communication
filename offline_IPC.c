@@ -179,7 +179,7 @@ long long changeStdIdAndCountInstance(struct pool *myPool, long long oldStdId, l
 
 long long generatePassword()
 {
-    return clock()%71;
+    return 1+clock()%71;
 }
 
 void initDS()
