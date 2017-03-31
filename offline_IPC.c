@@ -65,14 +65,15 @@ void initializePool( struct pool *pool, long long siz )
     }
 }
 
-void pushInPool(struct pool *myPool, long long stdId)
+void pushInPool(struct pool *myPool, long long stdId, long long password)
 {
     long long a, b, c, d, e, f;
     sem_wait( &(myPool->howMuchEmpty) );
     pthread_mutex_lock( &(myPool->myMutex) );
 
-    (myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
-
+    (myPool->endIdx)++;
+    (myPool->stdIdAr)[ (myPool->endIdx) ] = stdId;
+    (myPool->passwordAr)[ (myPool->endIdx) ] = password;
 
     pthread_mutex_unlock( &(myPool->myMutex) );
     sem_post( &(myPool->howMuchFull) );
@@ -94,7 +95,10 @@ long long popFromPool(struct pool *myPool)
     return ret;
 }
 
-
+long long countInstance(struct pool *myPool, long long stdId)
+{
+    //long long
+}
 
 
 void initDS()
@@ -168,9 +172,15 @@ void *studentThreadFunction(void *arg)
     long long a, b, c, d, e, f;
     long long stdId = *( (long long*) arg );
     sleep(5);
+
     printf("%lld trying to put application in outstanding pool\n\n", stdId);
-    pushInPool( &outstandingPool, stdId );
+    pushInPool( &outstandingPool, stdId, NONE );
     printf("%lld successfully submitted application in outstanding pool\n\n", stdId);
+    sleep(5);
+
+    printf("%lld trying to meet with B\n\n", stdId);
+    pushInPool( &quB, stdId, NONE );
+    printf("%lld successfully met with B\n\n", stdId);
     sleep(5);
 }
 
@@ -186,14 +196,26 @@ void *aceThreadFunction(void *arg)
         printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
         sleep(5);
         poppedStd = popFromPool( &outstandingPool );
-        printf("Teacher %c has popped std %lld from outstanding pool\n\n", teacherName, poppedStd);
+        printf("Teacher %c has popped std %lld from outstanding pool \n\n", teacherName, poppedStd);
         sleep(5);
     }
 }
 
 void *bThreadFunction(void *arg)
 {
-
+    long long a, b, c, d, e, f, poppedStd;
+    char teacherName = *( (long long*) arg ) ;
+    sleep(5);
+    printf(" Teacher %c  started working \n\n", teacherName);
+    sleep(5);
+    while(1)
+    {
+        printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
+        sleep(5);
+        poppedStd = popFromPool( &outstandingPool );
+        printf("Teacher %c has popped std %lld from outstanding pool\n\n", teacherName, poppedStd);
+        sleep(5);
+    }
 }
 
 void *dThreadFunction(void *arg)
