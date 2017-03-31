@@ -124,6 +124,19 @@ long long getPassword(struct pool *myPool, long long stdId)
     return ret;
 }
 
+void changeStdId(struct pool *myPool, long long oldStdId, long long newStdId)
+{
+    long long a, b, c, d, e, f;
+    pthread_mutex_lock( &(myPool->myMutex) );
+    for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
+    {
+        if ( (myPool->stdIdAr)[a] == oldStdId )
+        {
+            (myPool->stdIdAr)[a] = newStdId;
+        }
+    }
+    pthread_mutex_unlock( &(myPool->myMutex) );
+}
 
 void initDS()
 {
