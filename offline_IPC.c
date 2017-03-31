@@ -97,7 +97,15 @@ long long popFromPool(struct pool *myPool)
 
 long long countInstance(struct pool *myPool, long long stdId)
 {
-    //long long
+    long long a, b, c, d, e, f, ret = 0;
+
+    pthread_mutex_lock( &(myPool->myMutex) );
+    for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
+    {
+        ret += ( (myPool->stdIdAr)[a] == stdId );
+    }
+    pthread_mutex_unlock( &(myPool->myMutex) );
+    return ret;
 }
 
 
