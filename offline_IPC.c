@@ -5,12 +5,13 @@
 #include <string.h>
 #include <semaphore.h>
 #include <limits.h>
+#include <time.h>
 //#include <mutex.h>
 
 
 #define NONE 0
-#define TOTAL_STUDENT 1
-#define TOTAL_APPLICATION 2
+#define TOTAL_STUDENT 12
+#define TOTAL_APPLICATION 15
 
 #define SIZE 9999
 
@@ -41,6 +42,7 @@ struct pool duplicateFilter;
 struct pool quB;
 struct pool quD;
 struct pool bannedList;
+struct pool completeList;
 
 void initializePool( struct pool *pool, long long siz )
 {
@@ -126,32 +128,40 @@ long long getPassword(struct pool *myPool, long long stdId)
     return ret;
 }
 
-void changeStdId(struct pool *myPool, long long oldStdId, long long newStdId)
+long long changeStdIdAndCountInstance(struct pool *myPool, long long oldStdId, long long newStdId)
 {
-    long long a, b, c, d, e, f;
+    long long a, b, c, d, e, f, ret = 0;
     pthread_mutex_lock( &(myPool->myMutex) );
     for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
     {
         if ( (myPool->stdIdAr)[a] == oldStdId )
         {
             (myPool->stdIdAr)[a] = newStdId;
+            ret++;
         }
     }
     pthread_mutex_unlock( &(myPool->myMutex) );
+    return ret;
+}
+
+long long genPass()
+{
+    return clock()%71;
 }
 
 void initDS()
 {
     initializePool( &outstandingPool, 10 );
-    printf("Safely initialized outstandingPool\n");
+//    printf("Safely initialized outstandingPool\n");
     initializePool( &duplicateFilter, INT_MAX );
-    printf("Safely initialized duplicate pool \n");
+//    printf("Safely initialized duplicate pool \n");
     initializePool(&quB, 1);
-    printf("Safely initialized queue for B \n");
+//    printf("Safely initialized queue for B \n");
     initializePool(&bannedList, INT_MAX);
-    printf("Safely initialized banned list \n");
-    initializePool(&quD, INT_MAX);
-    printf("Safely initialized queue for D \n");
+//    printf("Safely initialized banned list \n");
+    initializePool(&quD, 1);
+//    printf("Safely initialized queue for D \n");
+    initializePool(&completeList, INT_MAX);
 }
 
 void createThreads()
@@ -221,7 +231,7 @@ void *studentThreadFunction(void *arg)
 
     printf("%lld trying to meet with B\n\n", stdId);
     pushInPool( &quB, stdId, NONE );
-    printf("%lld successfully met with B\n\n", stdId);
+    printf("%lld successfully put std id in qu B\n\n", stdId);
     sleep(5);
 }
 
@@ -239,23 +249,52 @@ void *aceThreadFunction(void *arg)
         poppedStd = popFromPool( &outstandingPool );
         printf("Teacher %c has popped std %lld from outstanding pool \n\n", teacherName, poppedStd);
         sleep(5);
+
+
     }
 }
 
 void *bThreadFunction(void *arg)
 {
-    long long a, b, c, d, e, f, poppedStd;
+    long long a, b, c, d, e, f, poppedStdId, isBanned, howManyInDuplicateFilter;
     char teacherName = *( (long long*) arg ) ;
     sleep(5);
     printf(" Teacher %c  started working \n\n", teacherName);
     sleep(5);
     while(1)
     {
-        printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
+        printf("Teacher %c is trying to pop a student from qu B\n\n", teacherName);
         sleep(5);
-        poppedStd = popFromPool( &outstandingPool );
-        printf("Teacher %c has popped std %lld from outstanding pool\n\n", teacherName, poppedStd);
+        poppedStdId = popFromPool( &quB );
+        printf("Teacher %c has popped std %lld from qu B\n\n", teacherName, poppedStdId);
         sleep(5);
+
+        isBanned = countInstance( &bannedList, poppedStdId );
+        printf("std %lld is already banned \n\n", poppedStdId);
+        sleep(5);
+        if ( isBanned )
+        {
+            continue;
+        }
+
+        howManyInDuplicateFilter = countInstance(&duplicateFilter, poppedStdId);
+        printf("std %lld has appeared %lld times in duplicate filter\n\n",
+            poppedStdId, howManyInDuplicateFilter);
+        sleep(5);
+
+        if ( isBanned || (howManyInDuplicateFilter > 1) )
+        {
+            pushInPool(&bannedList, poppedStdId, NONE);
+            printf("B rejected std %lld\n\n", poppedStdId);
+        }
+        else
+        {
+            pushInPool(&completeList, poppedStdId, genPass() );
+            printf("B forwarded std %lld to get password\n\n", poppedStdId);
+        }
+        sleep(5);
+
+        changeStdIdAndCountInstance(&duplicateFilter, poppedStdId, NONE);
     }
 }
 
