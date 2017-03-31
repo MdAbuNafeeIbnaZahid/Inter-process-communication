@@ -8,7 +8,7 @@
 //#include <mutex.h>
 
 
-#define NONE -1
+#define NONE 0
 #define TOTAL_STUDENT 1
 #define TOTAL_APPLICATION 2
 
@@ -103,6 +103,22 @@ long long countInstance(struct pool *myPool, long long stdId)
     for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
     {
         ret += ( (myPool->stdIdAr)[a] == stdId );
+    }
+    pthread_mutex_unlock( &(myPool->myMutex) );
+    return ret;
+}
+
+long long getPassword(struct pool *myPool, long long stdId)
+{
+    long long a, b, c, d, e, f, ret = NONE;
+
+    pthread_mutex_lock( &(myPool->myMutex) );
+    for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
+    {
+        if ( (myPool->stdIdAr)[a] == stdId )
+        {
+            ret = (myPool->passwordAr)[a];
+        }
     }
     pthread_mutex_unlock( &(myPool->myMutex) );
     return ret;
