@@ -35,10 +35,12 @@ struct pool
     sem_t howMuchFull;
 
 };
+
 struct pool outstandingPool;
 struct pool duplicateFilter;
 struct pool quB;
 struct pool quD;
+struct pool bannedList;
 
 void initializePool( struct pool *pool, long long siz )
 {
@@ -146,6 +148,8 @@ void initDS()
     printf("Safely initialized duplicate pool \n");
     initializePool(&quB, 1);
     printf("Safely initialized queue for B \n");
+    initializePool(&bannedList, INT_MAX);
+    printf("Safely initialized banned list \n");
     initializePool(&quD, INT_MAX);
     printf("Safely initialized queue for D \n");
 }
