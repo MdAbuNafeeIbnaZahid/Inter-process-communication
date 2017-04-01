@@ -44,6 +44,7 @@ struct pool quB;
 struct pool quD;
 struct pool bannedList;
 struct pool completeList;
+struct pool passwordDispatch;
 
 void initializePool( struct pool *pool, char *name, long long siz )
 {
@@ -208,10 +209,11 @@ void initDS()
     initializePool(&quB, "quB", 1);
 //    printf("Safely initialized queue for B \n");
     initializePool(&bannedList, "bannedList", INT_MAX);
+    initializePool(&completeList, "completeList", INT_MAX);
 //    printf("Safely initialized banned list \n");
     initializePool(&quD, "quD", 1);
 //    printf("Safely initialized queue for D \n");
-    initializePool(&completeList, "completeList", INT_MAX);
+    initializePool(&passwordDispatch, "password dispatch", 1);
 }
 
 void createThreads()
