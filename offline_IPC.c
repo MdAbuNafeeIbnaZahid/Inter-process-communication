@@ -275,7 +275,7 @@ int main()
 
 void *studentThreadFunction(void *arg)
 {
-    long long a, b, c, d, e, f;
+    long long a, b, c, d, e, f, passwordGot = NONE;
     long long stdId = *( (long long*) arg );
     char stdIdStr[SIZE];
     sprintf(stdIdStr, "%lld", stdId);
@@ -290,6 +290,18 @@ void *studentThreadFunction(void *arg)
     pushInPool( &quB, stdId, NONE, stdIdStr );
     //printf("%lld successfully put std id in qu B\n\n", stdId);
     sleep(5);
+
+    while(passwordGot == NONE)
+    {
+        printf("%lld trying to put stdid in  quD\n\n", stdId);
+        pushInPool( &quD, stdId, NONE, stdIdStr );
+        //printf("%lld successfully put std id in qu B\n\n", stdId);
+        sleep(GLOBAL_SLEEP_SEC);
+
+        passwordGot = popFromPool(&passwordDispatch, stdIdStr);
+        sleep(GLOBAL_SLEEP_SEC);
+    }
+    printf("Std %lld has finally got password %lld\n\n", stdId, passwordGot);
 }
 
 void *aceThreadFunction(void *arg)
