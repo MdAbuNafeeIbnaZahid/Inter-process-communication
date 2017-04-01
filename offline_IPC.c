@@ -15,6 +15,8 @@
 
 #define SIZE 9999
 
+#define GLOBAL_SLEEP_SEC 5
+
 //pthread_t stdThreadAr[SIZE];
 //pthread_t teacherThreadAr[SIZE];
 void *threadResult;
@@ -172,6 +174,7 @@ long long getPasswordAndDelete(struct pool *myPool, long long stdId)
         {
             ret = (myPool->passwordAr)[a];
             (myPool->stdIdAr)[a] = NONE;
+            printf("Password of %lld is %lld\n\n", stdId, ret);
             break;
         }
     }
@@ -408,7 +411,19 @@ void *bThreadFunction(void *arg)
 
 void *dThreadFunction(void *arg)
 {
-
+    long long a, b, c, d, e, f, poppedStdId, retrievedPassword;
+    printf("Teacher D started working \n\n");
+    sleep(GLOBAL_SLEEP_SEC);
+    while(1)
+    {
+        poppedStdId = popFromPool(&quD, "D");
+        sleep(GLOBAL_SLEEP_SEC);
+        retrievedPassword = getPasswordAndDelete(&completeList, poppedStdId);
+        printf("Teacher D has checked complete list for std %lld\n\n", poppedStdId);
+        sleep(GLOBAL_SLEEP_SEC);
+        pushInPool(&passwordDispatch, poppedStdId, retrievedPassword, "D");
+        sleep(GLOBAL_SLEEP_SEC);
+    }
 }
 
 
