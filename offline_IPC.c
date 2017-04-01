@@ -10,7 +10,7 @@
 
 
 #define NONE 0
-#define TOTAL_STUDENT 5
+#define TOTAL_STUDENT 12
 #define TOTAL_APPLICATION 15
 
 #define SIZE 9999
@@ -103,6 +103,33 @@ void pushInPool(struct pool *myPool, long long stdId, long long password, char *
     pthread_mutex_unlock( &(myPool->myMutex) );
     sem_post( &(myPool->howMuchFull) );
 }
+
+long long getFrontFromPool(struct pool *myPool, char *actorName)
+{
+    long long a, b, c, d, e, f, ret;
+    sem_wait( &(myPool->howMuchFull) );
+    pthread_mutex_lock( &(myPool->myMutex) );
+
+    //(myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
+    ret = (myPool->stdIdAr)[ (myPool->startIdx) ];
+
+    printf("pool name = %s\n"
+    "actor = %s\n"
+    "element = %lld\n"\
+    "action = getFrontFromPool\n"
+    "\n\n"
+    ,myPool->name
+    ,actorName
+    ,ret
+    );
+
+    pthread_mutex_unlock( &(myPool->myMutex) );
+
+    sem_post( &(myPool->howMuchFull) );
+
+    return ret;
+}
+
 
 long long popFromPool(struct pool *myPool, char *actorName)
 {
