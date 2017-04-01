@@ -248,7 +248,7 @@ void initDS()
 
 void createThreads()
 {
-    long long a, b, c, d, e, f, idx;
+    long long a, b, c, d, e, f, idx = 0;
 
     pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'A') );
     pthread_create( threadAr+(idx++), NULL, aceThreadFunction, (void*)(globalAr+'C') );
@@ -263,10 +263,10 @@ void createThreads()
     for ( a = 1; a <= TOTAL_APPLICATION; a++)
     {
         sleep(GLOBAL_SLEEP_SEC);
-        pthread_create( threadAr+a, NULL, studentThreadFunction, (void*)(globalAr+ (1+a%TOTAL_STUDENT) ) );
+        pthread_create( threadAr+(idx++), NULL, studentThreadFunction, (void*)(globalAr+ (1+a%TOTAL_STUDENT) ) );
         sleep(GLOBAL_SLEEP_SEC);
     }
-    idx = TOTAL_APPLICATION + 1;
+    //idx = TOTAL_APPLICATION + 1;
 
     // creating ACE
 
