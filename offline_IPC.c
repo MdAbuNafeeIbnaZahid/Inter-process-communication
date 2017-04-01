@@ -15,7 +15,7 @@
 
 #define SIZE 9999
 
-#define GLOBAL_SLEEP_SEC 5
+#define GLOBAL_SLEEP_SEC 0
 
 //pthread_t stdThreadAr[SIZE];
 //pthread_t teacherThreadAr[SIZE];
@@ -315,7 +315,7 @@ void *aceThreadFunction(void *arg)
     sleep(GLOBAL_SLEEP_SEC);
     while(1)
     {
-        printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
+        //printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
         sleep(GLOBAL_SLEEP_SEC);
         poppedStd = popFromPool( &outstandingPool, teacherNameStr );
         //printf("Teacher %c has popped std %lld from outstanding pool \n\n", teacherName, poppedStd);
@@ -337,7 +337,7 @@ void *bThreadFunction(void *arg)
     sleep(GLOBAL_SLEEP_SEC);
     while(1)
     {
-        printf("Teacher %c is trying to pop a student from qu B\n\n", teacherName);
+        //printf("Teacher %c is trying to pop a student from qu B\n\n", teacherName);
         sleep(GLOBAL_SLEEP_SEC);
         poppedStdId = popFromPool( &quB, teacherNameStr );
 //        printf("Teacher %c has popped std %lld from qu B\n\n", teacherName, poppedStdId);
@@ -431,9 +431,10 @@ void *dThreadFunction(void *arg)
         poppedStdId = popFromPool(&quD, "D");
         sleep(GLOBAL_SLEEP_SEC);
         retrievedPassword = getPasswordAndDelete(&completeList, poppedStdId);
-        printf("Teacher D has checked complete list for std %lld\n\n", poppedStdId);
+        printf("Teacher D has checked complete list for std %lld and got password %lld\n\n", poppedStdId,
+            retrievedPassword);
         sleep(GLOBAL_SLEEP_SEC);
-        pushInPool(&passwordDispatch, poppedStdId, retrievedPassword, "D");
+        pushInPool(&passwordDispatch, retrievedPassword, retrievedPassword, "D");
         sleep(GLOBAL_SLEEP_SEC);
     }
 }
