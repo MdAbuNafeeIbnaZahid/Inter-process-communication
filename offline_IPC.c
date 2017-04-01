@@ -161,6 +161,23 @@ long long getPassword(struct pool *myPool, long long stdId)
     return ret;
 }
 
+long long getPasswordAndDelete(struct pool *myPool, long long stdId)
+{
+    long long a, b, c, d, e,f , ret = NONE;
+    pthread_mutex_lock( &(myPool->myMutex) );
+    for ( a = myPool->startIdx; a <= myPool->endIdx; a++ )
+    {
+        if ( (myPool->stdIdAr)[a] == stdId )
+        {
+            ret = (myPool->passwordAr)[a];
+            (myPool->stdIdAr)[a] = NONE;
+            break;
+        }
+    }
+    pthread_mutex_unlock( &(myPool->myMutex) );
+    return ret;
+}
+
 long long changeStdIdAndCountInstance(struct pool *myPool, long long oldStdId, long long newStdId)
 {
     long long a, b, c, d, e, f, ret = 0;
