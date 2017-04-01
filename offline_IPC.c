@@ -355,7 +355,7 @@ void *aceThreadFunction(void *arg)
 
 void *bThreadFunction(void *arg)
 {
-    long long a, b, c, d, e, f, poppedStdId, isBanned, howManyInDuplicateFilter;
+    long long a, b, c, d, e, f, frontStdId, isBanned, howManyInDuplicateFilter;
     char teacherName = *( (long long*) arg ) ;
     char teacherNameStr[SIZE];
     sprintf(teacherNameStr, "%c", teacherName);
@@ -366,20 +366,21 @@ void *bThreadFunction(void *arg)
     {
         //printf("Teacher %c is trying to pop a student from qu B\n\n", teacherName);
         sleep(GLOBAL_SLEEP_SEC);
-        poppedStdId = popFromPool( &quB, teacherNameStr );
+        frontStdId = getFrontFromPool( &quB, teacherNameStr );
 //        printf("Teacher %c has popped std %lld from qu B\n\n", teacherName, poppedStdId);
         sleep(GLOBAL_SLEEP_SEC);
 
-        isBanned = countInstance( &bannedList, poppedStdId );
+        isBanned = countInstance( &bannedList, frontStdId );
 
         sleep(GLOBAL_SLEEP_SEC);
         if ( isBanned )
         {
-            printf("std %lld is already banned \n\n", poppedStdId);
+            printf("std %lld is already banned \n\n", frontStdId);
+            popFromPool(&quB, "B");
             continue;
         }
 
-        howManyInDuplicateFilter = changeStdIdAndCountInstance(&duplicateFilter, poppedStdId, NONE);
+        howManyInDuplicateFilter = changeStdIdAndCountInstance(&duplicateFilter, frontStdId, NONE);
         if ( howManyInDuplicateFilter == 0 )
         {
             sem_init( &(duplicateFilter.howMuchFull), 0, 0);
@@ -389,27 +390,29 @@ void *bThreadFunction(void *arg)
         {
             sem_wait( &(duplicateFilter.howMuchFull) );
             howManyInDuplicateFilter =
-                changeStdIdAndCountInstance(&duplicateFilter, poppedStdId, NONE);
+                changeStdIdAndCountInstance(&duplicateFilter, frontStdId, NONE);
             sleep(GLOBAL_SLEEP_SEC);
         }
 
         printf("std %lld has appeared %lld times in duplicate filter\n\n",
-            poppedStdId, howManyInDuplicateFilter);
+            frontStdId, howManyInDuplicateFilter);
         sleep(GLOBAL_SLEEP_SEC);
         if ( howManyInDuplicateFilter > 1 )
         {
-            pushInPool(&bannedList, poppedStdId, NONE, teacherNameStr);
+            pushInPool(&bannedList, frontStdId, NONE, teacherNameStr);
             //printf("B has banned std %lld\n\n", poppedStdId);
             sleep(GLOBAL_SLEEP_SEC);
+            popFromPool(&quB, "B");
             continue;
         }
 
 
         if ( howManyInDuplicateFilter == 1 )
         {
-            pushInPool( &completeList, poppedStdId, generatePassword( poppedStdId ), teacherNameStr );
+            pushInPool( &completeList, frontStdId, generatePassword( frontStdId ), teacherNameStr );
             //printf("B forwarded std %lld to get password\n\n", poppedStdId);
             sleep(GLOBAL_SLEEP_SEC);
+            popFromPool(&quB, "B");
             continue;
         }
 
