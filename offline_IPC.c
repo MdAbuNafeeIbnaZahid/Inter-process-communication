@@ -281,19 +281,19 @@ void *studentThreadFunction(void *arg)
     sprintf(stdIdStr, "%lld", stdId);
     sleep(GLOBAL_SLEEP_SEC);
 
-    printf("%lld trying to put application in outstanding pool\n\n", stdId);
+    //printf("%lld trying to put application in outstanding pool\n\n", stdId);
     pushInPool( &outstandingPool, stdId, NONE, stdIdStr );
     //printf("%lld successfully submitted application in outstanding pool\n\n", stdId);
     sleep(GLOBAL_SLEEP_SEC);
 
-    printf("%lld trying to put stdid in  quB\n\n", stdId);
+    //printf("%lld trying to put stdid in  quB\n\n", stdId);
     pushInPool( &quB, stdId, NONE, stdIdStr );
     //printf("%lld successfully put std id in qu B\n\n", stdId);
     sleep(GLOBAL_SLEEP_SEC);
 
     while(passwordGot == NONE)
     {
-        printf("%lld trying to put stdid in  quD\n\n", stdId);
+        //printf("%lld trying to put stdid in  quD\n\n", stdId);
         pushInPool( &quD, stdId, NONE, stdIdStr );
         //printf("%lld successfully put std id in qu B\n\n", stdId);
         sleep(GLOBAL_SLEEP_SEC);
