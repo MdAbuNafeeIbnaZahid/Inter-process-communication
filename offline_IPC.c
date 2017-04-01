@@ -224,9 +224,9 @@ void createThreads()
     long long a, b, c, d, e, f, idx;
     for ( a = 1; a <= TOTAL_APPLICATION; a++)
     {
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
         pthread_create( threadAr+a, NULL, studentThreadFunction, (void*)(globalAr+ (1+a%TOTAL_STUDENT) ) );
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
     }
     idx = TOTAL_APPLICATION + 1;
 
@@ -279,17 +279,17 @@ void *studentThreadFunction(void *arg)
     long long stdId = *( (long long*) arg );
     char stdIdStr[SIZE];
     sprintf(stdIdStr, "%lld", stdId);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
 
     printf("%lld trying to put application in outstanding pool\n\n", stdId);
     pushInPool( &outstandingPool, stdId, NONE, stdIdStr );
     //printf("%lld successfully submitted application in outstanding pool\n\n", stdId);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
 
     printf("%lld trying to put stdid in  quB\n\n", stdId);
     pushInPool( &quB, stdId, NONE, stdIdStr );
     //printf("%lld successfully put std id in qu B\n\n", stdId);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
 
     while(passwordGot == NONE)
     {
@@ -310,19 +310,19 @@ void *aceThreadFunction(void *arg)
     char teacherName = *( (long long*) arg ) ;
     char teacherNameStr[SIZE];
     sprintf(teacherNameStr, "%c", teacherName);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
     printf(" Teacher %c  started working \n\n", teacherName);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
     while(1)
     {
         printf("Teacher %c is trying to pop a student from outstanding pool\n\n", teacherName);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
         poppedStd = popFromPool( &outstandingPool, teacherNameStr );
         //printf("Teacher %c has popped std %lld from outstanding pool \n\n", teacherName, poppedStd);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
 
         pushInPool(&duplicateFilter, poppedStd, NONE, teacherNameStr);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
     }
 }
 
@@ -332,20 +332,20 @@ void *bThreadFunction(void *arg)
     char teacherName = *( (long long*) arg ) ;
     char teacherNameStr[SIZE];
     sprintf(teacherNameStr, "%c", teacherName);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
     printf(" Teacher %c  started working \n\n", teacherName);
-    sleep(5);
+    sleep(GLOBAL_SLEEP_SEC);
     while(1)
     {
         printf("Teacher %c is trying to pop a student from qu B\n\n", teacherName);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
         poppedStdId = popFromPool( &quB, teacherNameStr );
 //        printf("Teacher %c has popped std %lld from qu B\n\n", teacherName, poppedStdId);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
 
         isBanned = countInstance( &bannedList, poppedStdId );
 
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
         if ( isBanned )
         {
             printf("std %lld is already banned \n\n", poppedStdId);
@@ -363,17 +363,17 @@ void *bThreadFunction(void *arg)
             sem_wait( &(duplicateFilter.howMuchFull) );
             howManyInDuplicateFilter =
                 changeStdIdAndCountInstance(&duplicateFilter, poppedStdId, NONE);
-            sleep(5);
+            sleep(GLOBAL_SLEEP_SEC);
         }
 
         printf("std %lld has appeared %lld times in duplicate filter\n\n",
             poppedStdId, howManyInDuplicateFilter);
-        sleep(5);
+        sleep(GLOBAL_SLEEP_SEC);
         if ( howManyInDuplicateFilter > 1 )
         {
             pushInPool(&bannedList, poppedStdId, NONE, teacherNameStr);
             //printf("B has banned std %lld\n\n", poppedStdId);
-            sleep(5);
+            sleep(GLOBAL_SLEEP_SEC);
             continue;
         }
 
@@ -382,7 +382,7 @@ void *bThreadFunction(void *arg)
         {
             pushInPool( &completeList, poppedStdId, generatePassword( poppedStdId ), teacherNameStr );
             //printf("B forwarded std %lld to get password\n\n", poppedStdId);
-            sleep(5);
+            sleep(GLOBAL_SLEEP_SEC);
             continue;
         }
 
