@@ -225,9 +225,11 @@ long long changeStdIdAndCountInstance(struct pool *myPool, long long oldStdId, l
     return ret;
 }
 
-long long generatePassword()
+long long generatePassword(long long stdId)
 {
-    return 1+clock()%71;
+    long long ret = ( 1+clock()%71 ) * 100 + stdId;
+    printf("In generate password, stdId = %lld, ret = %lld\n\n", stdId, ret);
+    return ret;
 }
 
 void initDS()
