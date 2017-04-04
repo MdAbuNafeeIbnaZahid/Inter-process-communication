@@ -90,10 +90,10 @@ void pushInPool(struct pool *myPool, long long stdId, long long password, char *
 //    printf("action = push\n");
 //    printf("\n\n");
 
-    printf("pool name = %s\n"
-    "actor = %s\n"
-    "element = %lld\n"\
-    "action = push\n"
+    printf("pool name = %s;  "
+    "actor = %s;  "
+    "element = %lld;  "
+    "action = push;  "
     "\n\n"
     ,myPool->name
     ,actorName
@@ -113,10 +113,10 @@ long long getFrontFromPool(struct pool *myPool, char *actorName)
     //(myPool->stdIdAr)[ ++(myPool->endIdx) ] = stdId;
     ret = (myPool->stdIdAr)[ (myPool->startIdx) ];
 
-    printf("pool name = %s\n"
-    "actor = %s\n"
-    "element = %lld\n"\
-    "action = getFrontFromPool\n"
+    printf("pool name = %s;  "
+    "actor = %s;  "
+    "element = %lld;  "
+    "action = getFrontFromPool;  "
     "\n\n"
     ,myPool->name
     ,actorName
@@ -146,10 +146,10 @@ long long popFromPool(struct pool *myPool, char *actorName)
 //    printf("action = pop\n");
 //    printf("\n\n");
 
-    printf("pool name = %s\n"
-    "actor = %s\n"
-    "element = %lld\n"\
-    "action = pop\n"
+    printf("pool name = %s;  "
+    "actor = %s;  "
+    "element = %lld;  "
+    "action = pop;  "
     "\n\n"
     ,myPool->name
     ,actorName
@@ -228,7 +228,7 @@ long long changeStdIdAndCountInstance(struct pool *myPool, long long oldStdId, l
 long long generatePassword(long long stdId)
 {
     long long ret = ( 1+clock()%71 ) * 100 + stdId;
-    printf("In generate password, stdId = %lld, ret = %lld\n\n", stdId, ret);
+//    printf("In generate password, stdId = %lld, ret = %lld\n\n", stdId, ret);
     return ret;
 }
 
@@ -458,18 +458,25 @@ void *bThreadFunction(void *arg)
 
 void *dThreadFunction(void *arg)
 {
-    long long a, b, c, d, e, f, poppedStdId, retrievedPassword;
+    long long a, b, c, d, e, f, poppedStdId, retrievedPassword, frontStdId;
     printf("Teacher D started working \n\n");
     sleep(GLOBAL_SLEEP_SEC);
     while(1)
     {
-        poppedStdId = popFromPool(&quD, "D");
+        frontStdId = getFrontFromPool(&quD, "D");
         sleep(GLOBAL_SLEEP_SEC);
-        retrievedPassword = getPasswordAndDelete(&completeList, poppedStdId);
-        printf("Teacher D has checked complete list for std %lld and got password %lld\n\n", poppedStdId,
-            retrievedPassword);
+        retrievedPassword = getPasswordAndDelete(&completeList, frontStdId);
+        //printf("Teacher D has checked complete list for std %lld and got password %lld\n\n", poppedStdId,
+            //retrievedPassword);
         sleep(GLOBAL_SLEEP_SEC);
         pushInPool(&passwordDispatch, retrievedPassword, retrievedPassword, "D");
+        // Now make sure that std has received answer from passwordDispatch
+        // for this reason I will push a dummy value and pop it from pool
+        pushInPool(&passwordDispatch, NONE, NONE, "D");
+        popFromPool(&passwordDispatch, "D");
+        // it is sure student has received password
+        popFromPool(&quD, "D"); // now we can safely pop from quD so that another student may
+        // push in quD
         sleep(GLOBAL_SLEEP_SEC);
     }
 }
