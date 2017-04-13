@@ -1,4 +1,4 @@
-// comment to check git
+// added new thing
 
 #include <stdio.h>
 #include <unistd.h>
@@ -30,6 +30,8 @@ void *studentThreadFunction(void *arg); // stdId will be passed
 void *aceThreadFunction(void *arg); // Teacher name ('A', 'C', 'E') will be passed
 void *bThreadFunction(void *arg);
 void *dThreadFunction(void *arg);
+
+// added 2nd thing
 
 struct pool
 {
@@ -75,6 +77,8 @@ void initializePool( struct pool *pool, char *name, long long siz )
         exit(0);
     }
 }
+
+// added 3rd thing
 
 void pushInPool(struct pool *myPool, long long stdId, long long password, char *actorName)
 {
@@ -511,3 +515,6 @@ void initializeOustandingPool()
     }
 
 }
+
+
+// comment at the end
